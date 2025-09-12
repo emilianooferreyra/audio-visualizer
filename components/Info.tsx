@@ -1,6 +1,7 @@
 import { Track } from "@/types/deezer";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import TextTicker from "react-native-text-ticker";
 import { FrequencyChart } from "./FrecuencyChart";
 import { Underline } from "./Underline";
 
@@ -12,10 +13,19 @@ import {
   SkipForward,
 } from "lucide-react-native";
 
+const formatTime = (seconds: number) => {
+  const s = Math.max(0, Math.floor(seconds || 0));
+  const mPart = Math.floor(s / 60);
+  const sPart = s % 60;
+  const mm = `${mPart}`;
+  const ss = sPart < 10 ? `0${sPart}` : `${sPart}`;
+  return `${mm}:${ss}`;
+};
+
 interface Props {
   isLoading: boolean;
   isPlaying: boolean;
-  percentComplete: number;
+  percentComplete: number; // 0..1
   currentTrack: Track | null;
   canGoPrevious?: boolean;
   canGoNext?: boolean;
@@ -23,7 +33,10 @@ interface Props {
   onNext: () => void;
   onPrevious: () => void;
   handlePlayPause: () => void;
-  onTracksLoaded?: (tracks: Track[]) => void;
+  onSeekPercent?: (percent: number) => void;
+  onSeekBySeconds?: (delta: number) => void;
+  currentTimeSec?: number;
+  durationSec?: number;
 }
 
 const Info = ({
@@ -37,10 +50,18 @@ const Info = ({
   handlePlayPause,
   onPrevious,
   onNext,
+  onSeekPercent,
+  currentTimeSec = 0,
+  durationSec = 0,
 }: Props) => {
   return (
     <View style={styles.mainContainer}>
-      <Underline percentComplete={percentComplete} />
+      <Underline percentComplete={percentComplete} onSeek={onSeekPercent} />
+
+      <View style={styles.timeRow}>
+        <Text style={styles.timeText}>{formatTime(currentTimeSec)}</Text>
+        <Text style={styles.timeText}>{formatTime(durationSec)}</Text>
+      </View>
 
       {frequencyData && frequencyData.length > 0 && (
         <View style={styles.chartContainer}>
@@ -57,56 +78,52 @@ const Info = ({
               currentTrack?.artist?.name ||
               "Unknown Artist"}
           </Text>
-          <Text style={styles.titleText} numberOfLines={1}>
+          <TextTicker
+            style={styles.titleText}
+            duration={12000}
+            loop
+            bounce={false}
+            repeatSpacer={50}
+            marqueeDelay={800}
+          >
             {currentTrack?.name || currentTrack?.title || "No Track Selected"}
-          </Text>
-          {!isLoading && !!currentTrack && (
-            <Text style={styles.previewNotAvailableText}>
-              {isPlaying ? "Reproduciendo..." : "Pausado"}
-            </Text>
-          )}
+          </TextTicker>
         </View>
 
-        {isLoading ? (
-          <View style={styles.loadingContainer}>
-            <Text style={styles.loadingText}>Cargando...</Text>
-          </View>
-        ) : (
-          <View style={styles.controlsContainer}>
-            <TouchableOpacity
-              onPress={onPrevious}
-              disabled={!canGoPrevious}
-              style={[
-                styles.playPauseButton,
-                { opacity: canGoPrevious ? 0.5 : 1 },
-              ]}
-            >
-              <SkipBack size={30} color="white" />
-            </TouchableOpacity>
+        <View style={styles.controlsContainer}>
+          <TouchableOpacity
+            onPress={onPrevious}
+            disabled={!canGoPrevious}
+            style={[
+              styles.playPauseButton,
+              { opacity: canGoPrevious ? 1 : 0.5 },
+            ]}
+          >
+            <SkipBack size={30} color="white" />
+          </TouchableOpacity>
 
-            <TouchableOpacity
-              onPress={handlePlayPause}
-              disabled={isLoading}
-              style={[styles.playPauseButton, { opacity: isLoading ? 0.5 : 1 }]}
-            >
-              {isLoading ? (
-                <Loader2 size={30} color="white" />
-              ) : isPlaying ? (
-                <Pause size={30} color="white" />
-              ) : (
-                <Play size={30} color="white" />
-              )}
-            </TouchableOpacity>
+          <TouchableOpacity
+            onPress={handlePlayPause}
+            disabled={isLoading}
+            style={[styles.playPauseButton, { opacity: isLoading ? 0.5 : 1 }]}
+          >
+            {isLoading ? (
+              <Loader2 size={30} color="white" />
+            ) : isPlaying ? (
+              <Pause size={30} color="white" />
+            ) : (
+              <Play size={30} color="white" />
+            )}
+          </TouchableOpacity>
 
-            <TouchableOpacity
-              onPress={onNext}
-              disabled={!canGoNext}
-              style={[styles.playPauseButton, { opacity: canGoNext ? 0.5 : 1 }]}
-            >
-              <SkipForward size={30} color="white" />
-            </TouchableOpacity>
-          </View>
-        )}
+          <TouchableOpacity
+            onPress={onNext}
+            disabled={!canGoNext}
+            style={[styles.playPauseButton, { opacity: canGoNext ? 1 : 0.5 }]}
+          >
+            <SkipForward size={30} color="white" />
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -148,7 +165,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   trackInfoContainer: {
-    alignItems: "center",
+    alignItems: "flex-start",
     paddingHorizontal: 20,
   },
   artistText: {
@@ -170,14 +187,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
-    marginTop: 20,
+    marginTop: 12,
   },
   controlButton: {
     padding: 10,
     marginHorizontal: 10,
   },
   playPauseButton: {
-    backgroundColor: "black",
+    backgroundColor: "gray",
     width: 60,
     height: 60,
     borderRadius: 30,
@@ -190,6 +207,31 @@ const styles = StyleSheet.create({
   playPauseText: {
     fontSize: 30,
     color: "white",
+  },
+  seekRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 40,
+  },
+  seekButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 14,
+    borderRadius: 16,
+    backgroundColor: "#1f1f1f",
+  },
+  seekText: {
+    color: "white",
+    fontSize: 14,
+  },
+  timeRow: {
+    marginTop: 4,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 8,
+  },
+  timeText: {
+    fontSize: 12,
+    color: "#999",
   },
 });
 

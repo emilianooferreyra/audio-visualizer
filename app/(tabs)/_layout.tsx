@@ -6,7 +6,7 @@ import { HapticTab } from "@/components/HapticTab";
 import TabBarBackground from "@/components/ui/TabBarBackground";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { Compass, Home } from "lucide-react-native";
+import { Compass, Heart, Home, Search } from "lucide-react-native";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -38,6 +38,20 @@ export default function TabLayout() {
         options={{
           title: "Explore",
           tabBarIcon: ({ color }) => <Compass size={28} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="search"
+        options={{
+          title: "Search",
+          tabBarIcon: ({ color }) => <Search size={28} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="heart"
+        options={{
+          title: "Heart",
+          tabBarIcon: ({ color }) => <Heart size={28} color={color} />,
         }}
       />
     </Tabs>
