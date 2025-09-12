@@ -1,0 +1,8 @@
+-add ErrorBoundary [x]
+-fix playing songs from the Deezer API []
+-add improvements to the UI []
+-try to reduce the use of useEffects []
+-add functionality to the player []
+-add the frequency chart and ensure the bars are calculated correctly []
+-add a list of songs in the browser or just a section with a nice Deezer UI []
+-try to run it with Expo Go, and see if the QR code works correctly so it can be viewed on phones []
