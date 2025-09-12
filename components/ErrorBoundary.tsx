@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 
 interface Props {
   children: React.ReactNode;
+  fallback?: React.ReactNode;
 }
 
 interface State {
@@ -25,6 +26,9 @@ class ErrorBoundary extends React.Component<Props, State> {
 
   render() {
     if (this.state.hasError) {
+      if (this.props.fallback) {
+        return this.props.fallback;
+      }
       return (
         <View style={styles.container}>
           <Text style={styles.text}>Something went wrong.</Text>

@@ -81,7 +81,6 @@ export const useAudioPlayer = (
     animationFrameRef.current = requestAnimationFrame(drawRef.current!);
   }, []);
 
-  // Update the ref whenever draw changes
   drawRef.current = draw;
 
   const playAt = useCallback(
