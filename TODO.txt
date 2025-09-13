@@ -10,3 +10,5 @@
 -try to run it with Expo Go, and see if the QR code works correctly so it can be viewed on phones []
 -try to reduce the use of useEffects []
 -change the naming of the variables, to make it more understandable []
+-change the color of my search tab, and adjust the UI []
+-give functionality to these two tabs with the API []

@@ -25,7 +25,7 @@ const formatTime = (seconds: number) => {
 interface Props {
   isLoading: boolean;
   isPlaying: boolean;
-  percentComplete: number; // 0..1
+  percentComplete: number;
   currentTrack: Track | null;
   canGoPrevious?: boolean;
   canGoNext?: boolean;

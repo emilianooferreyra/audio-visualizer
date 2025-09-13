@@ -8,7 +8,6 @@ import {
   Settings,
   Target,
 } from "lucide-react-native";
-import React from "react";
 import {
   Image,
   SafeAreaView,
@@ -282,6 +281,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#1F2937",
     marginBottom: 8,
+    marginTop: 8,
   },
   sectionSubtitle: {
     fontSize: 14,
