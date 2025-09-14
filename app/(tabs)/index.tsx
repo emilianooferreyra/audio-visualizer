@@ -1,10 +1,10 @@
 import { FrequencyChart } from "@/components/FrecuencyChart";
 import Info from "@/components/Info";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
-import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
+import { DeezerColors } from "@/constants/Colors";
 import { usePlaylist } from "@/hooks/usePlaylist";
-import { Image, StyleSheet } from "react-native";
+import { Image, StyleSheet, Text, View } from "react-native";
 
 export default function HomeScreen() {
   const {
@@ -25,12 +25,13 @@ export default function HomeScreen() {
 
   return (
     <ParallaxScrollView
-      headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }}
+      headerBackgroundColor={{
+        light: DeezerColors.background,
+        dark: DeezerColors.background,
+      }}
       headerImage={(() => {
         const albumUri =
-          currentTrack?.album?.cover_medium ||
-          currentTrack?.album?.cover ||
-          currentTrack?.album?.images?.[0]?.url;
+          currentTrack?.album?.cover_medium || currentTrack?.album?.cover;
         if (albumUri) {
           return (
             <Image
@@ -48,10 +49,16 @@ export default function HomeScreen() {
         );
       })()}
     >
-      <ThemedView style={styles.playerContainer}>
-        <ThemedView style={styles.titleContainer}>
-          <ThemedText type="title">Visualizer</ThemedText>
-        </ThemedView>
+      <ThemedView
+        style={[
+          styles.playerContainer,
+          { backgroundColor: DeezerColors.background },
+        ]}
+      >
+        <View style={styles.titleContainer}>
+          <Text style={styles.titleText}>Audio</Text>
+          <Text style={styles.titleText}>Visualizer</Text>
+        </View>
 
         <FrequencyChart data={freqs} isPlaying={isPlaying} />
         <Info
@@ -90,11 +97,18 @@ const styles = StyleSheet.create({
   titleContainer: {
     flexDirection: "row",
     gap: 8,
+    marginBottom: 20,
+  },
+  titleText: {
+    fontSize: 40,
+    color: DeezerColors.text,
+    fontWeight: "bold",
   },
   playerContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     paddingTop: 100,
+    backgroundColor: DeezerColors.background,
   },
 });

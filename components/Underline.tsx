@@ -1,4 +1,5 @@
 import { PLAYER_WIDTH } from "@/constants/Audio";
+import { DeezerColors } from "@/constants/Colors";
 import { Rect, Canvas as SKCanvas } from "@shopify/react-native-skia";
 import { GestureResponderEvent, Pressable } from "react-native";
 
@@ -26,13 +27,19 @@ export const Underline = ({
           alignSelf: "center",
         }}
       >
-        <Rect x={0} y={12.5} width={PLAYER_WIDTH} height={1} color="gray" />
+        <Rect
+          x={0}
+          y={12.5}
+          width={PLAYER_WIDTH}
+          height={1}
+          color={DeezerColors.divider}
+        />
         <Rect
           x={0}
           y={12.5 - 2}
           width={PLAYER_WIDTH * Math.max(0, Math.min(percentComplete, 1))}
           height={5}
-          color="#4A90E2"
+          color={DeezerColors.text}
         />
       </SKCanvas>
     </Pressable>

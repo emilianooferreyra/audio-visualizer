@@ -1,6 +1,7 @@
 import { FFT_SIZE, GROUP_QUANTITY, PLAYER_WIDTH } from "@/constants/Audio";
+import { DeezerColors } from "@/constants/Colors";
 import { RoundedRect, Canvas as SKCanvas } from "@shopify/react-native-skia";
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 
 interface Point {
   x1: number;
@@ -41,7 +42,7 @@ export const FrequencyChart = (props: ChartProps) => {
       const x = barIndex * (barWidth + 5);
       const y1 = height;
       const y2 = isPlaying ? height - height * (average / 255) : height - 2;
-      const color = "black";
+      const color = "#a238ff";
 
       p.push({ x1: x, x2: x, y1, y2, color });
       barIndex++;
@@ -56,6 +57,8 @@ export const FrequencyChart = (props: ChartProps) => {
         width: PLAYER_WIDTH,
         height: 200,
         alignSelf: "center",
+        backgroundColor: DeezerColors.background,
+        borderRadius: 12,
       }}
     >
       {points.map((point, index) => (

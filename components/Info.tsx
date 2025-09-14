@@ -1,3 +1,4 @@
+import { DeezerColors } from "@/constants/Colors";
 import { Track } from "@/types/deezer";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -72,11 +73,7 @@ const Info = ({
       <View style={styles.container}>
         <View style={styles.trackInfoContainer}>
           <Text style={styles.artistText} numberOfLines={1}>
-            {currentTrack?.artists
-              ?.map((a: { name: string }) => a.name)
-              .join(", ") ||
-              currentTrack?.artist?.name ||
-              "Unknown Artist"}
+            {currentTrack?.artist?.name || "Unknown Artist"}
           </Text>
           <TextTicker
             style={styles.titleText}
@@ -170,13 +167,14 @@ const styles = StyleSheet.create({
   },
   artistText: {
     fontSize: 16,
-    color: "#666",
+    color: DeezerColors.textSecondary,
     marginBottom: 5,
   },
   titleText: {
     fontSize: 20,
     fontWeight: "bold",
     marginBottom: 5,
+    color: DeezerColors.text,
   },
   previewNotAvailableText: {
     fontSize: 14,
@@ -194,12 +192,17 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   playPauseButton: {
-    backgroundColor: "gray",
+    backgroundColor: DeezerColors.primary,
     width: 60,
     height: 60,
     borderRadius: 30,
     justifyContent: "center",
     alignItems: "center",
+    shadowColor: DeezerColors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
   controlText: {
     fontSize: 24,
@@ -231,7 +234,7 @@ const styles = StyleSheet.create({
   },
   timeText: {
     fontSize: 12,
-    color: "#999",
+    color: DeezerColors.textTertiary,
   },
 });
 

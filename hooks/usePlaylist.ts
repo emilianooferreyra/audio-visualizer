@@ -3,12 +3,12 @@ import { getTopTracksByArtist } from "@/services/deezerApiService";
 import { Track } from "@/types/deezer";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-type UsePlaylistProps = {
+type PlaylistProps = {
   artistName: string;
   trackCount: number;
 };
 
-export function usePlaylist({ artistName, trackCount }: UsePlaylistProps) {
+export function usePlaylist({ artistName, trackCount }: PlaylistProps) {
   const [tracks, setTracks] = useState<Track[]>([]);
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   const [autoplayOnChange, setAutoplayOnChange] = useState(false);
@@ -19,7 +19,7 @@ export function usePlaylist({ artistName, trackCount }: UsePlaylistProps) {
         const list = await getTopTracksByArtist(artistName, trackCount);
         const normalized = list.map((t: Track) => ({
           ...t,
-          preview_url: t.preview_url || t.preview || null,
+          preview_url: t.preview || null,
         }));
         setTracks(normalized);
         setAutoplayOnChange(false);
@@ -35,7 +35,7 @@ export function usePlaylist({ artistName, trackCount }: UsePlaylistProps) {
   }, [tracks, currentTrackIndex]);
 
   const currentTrackUrl = useMemo(() => {
-    return currentTrack?.preview_url || "";
+    return currentTrack?.preview || "";
   }, [currentTrack]);
 
   const handleNext = useCallback(() => {
@@ -54,10 +54,9 @@ export function usePlaylist({ artistName, trackCount }: UsePlaylistProps) {
     currentTrackUrl,
     useMemo(
       () => ({
-        onEnded: handleNext,
         autoplayOnLoad: autoplayOnChange,
       }),
-      [handleNext, autoplayOnChange]
+      [autoplayOnChange]
     )
   );
 

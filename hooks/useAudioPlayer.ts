@@ -23,6 +23,8 @@ export const useAudioPlayer = (
   const [freqs, setFreqs] = useState<Uint8Array>(
     new Uint8Array(FFT_SIZE / 2).fill(0)
   );
+  const [percentComplete, setPercentComplete] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
 
   const audioContextRef = useRef<AudioContext | null>(null);
   const bufferSourceRef = useRef<AudioBufferSourceNode | null>(null);
@@ -35,16 +37,12 @@ export const useAudioPlayer = (
   const suppressOnEndedRef = useRef<boolean>(false);
   const drawRef = useRef<() => void>(() => {});
 
-  // Helper utilities to avoid noisy try/catch blocks
   const safeStop = (source: AudioBufferSourceNode | null) => {
     if (!source) return;
     try {
       source.stop();
     } catch (error) {
-      console.log(
-        "AudioSource.stop() failed (expected if already stopped):",
-        error
-      );
+      console.log("AudioSource.stop() failed:", error);
     }
   };
 
@@ -53,10 +51,7 @@ export const useAudioPlayer = (
     try {
       source.disconnect();
     } catch (error) {
-      console.log(
-        "AudioSource.disconnect() failed (expected if already disconnected):",
-        error
-      );
+      console.log("AudioSource.disconnect() failed:", error);
     }
   };
 
@@ -69,9 +64,7 @@ export const useAudioPlayer = (
   }, []);
 
   const draw = useCallback(() => {
-    if (!analyserRef.current) {
-      return;
-    }
+    if (!analyserRef.current) return;
 
     const frequencyArrayLength = analyserRef.current.frequencyBinCount;
     const freqsArray = new Uint8Array(frequencyArrayLength);
@@ -82,6 +75,14 @@ export const useAudioPlayer = (
   }, []);
 
   drawRef.current = draw;
+
+  const getCurrentPlaybackTime = useCallback(() => {
+    if (!audioContextRef.current) return 0;
+    if (isPlaying) {
+      return audioContextRef.current.currentTime - startTimeRef.current;
+    }
+    return pausedTimeRef.current;
+  }, [isPlaying]);
 
   const playAt = useCallback(
     (resumeTime = 0) => {
@@ -109,9 +110,13 @@ export const useAudioPlayer = (
           suppressOnEndedRef.current = false;
           return;
         }
+
         setIsPlaying(false);
         cancelAnimationFrame(animationFrameRef.current);
-        if (typeof onEnded === "function") onEnded();
+
+        pausedTimeRef.current = 0;
+        setPercentComplete(0);
+        setCurrentTime(0);
       };
 
       try {
@@ -154,6 +159,7 @@ export const useAudioPlayer = (
       playAt(target);
     } else {
       pausedTimeRef.current = target;
+      setCurrentTime(target);
     }
   };
 
@@ -162,15 +168,6 @@ export const useAudioPlayer = (
     seekTo(current + deltaSeconds);
   };
 
-  const getCurrentPlaybackTime = useCallback(() => {
-    if (!audioContextRef.current) return 0;
-    if (isPlaying) {
-      return audioContextRef.current.currentTime - startTimeRef.current;
-    }
-    return pausedTimeRef.current;
-  }, [isPlaying]);
-
-  const [percentComplete, setPercentComplete] = useState(0);
   const isPlayable = !!audioBufferRef.current;
   const duration = audioBufferRef.current?.duration ?? 0;
 
@@ -178,11 +175,13 @@ export const useAudioPlayer = (
     const interval = setInterval(() => {
       if (!audioContextRef.current || !audioBufferRef.current) {
         setPercentComplete(0);
+        setCurrentTime(0);
         return;
       }
-      const currentTime = getCurrentPlaybackTime();
+      const now = getCurrentPlaybackTime();
       const total = audioBufferRef.current.duration;
-      setPercentComplete(total > 0 ? currentTime / total : 0);
+      setCurrentTime(Math.min(now, total));
+      setPercentComplete(total > 0 ? Math.min(now / total, 1) : 0);
     }, 250);
 
     return () => clearInterval(interval);
@@ -209,6 +208,8 @@ export const useAudioPlayer = (
       setIsPlaying(false);
       setIsLoading(true);
       setFreqs(new Uint8Array(FFT_SIZE / 2).fill(0));
+      setPercentComplete(0);
+      setCurrentTime(0);
       startTimeRef.current = 0;
       pausedTimeRef.current = 0;
       audioBufferRef.current = null;
@@ -260,9 +261,9 @@ export const useAudioPlayer = (
     playFromStart: () => playAt(0),
     seekTo,
     seekBy,
-    percentComplete, // 0..1
+    percentComplete,
     duration,
-    currentTime: getCurrentPlaybackTime(),
+    currentTime,
     audioBuffer: audioBufferRef.current,
     isPlayable,
   };
