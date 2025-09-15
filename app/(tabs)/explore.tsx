@@ -1,4 +1,6 @@
-import { DeezerColors } from "@/constants/Colors";
+import { CategoryCard } from "@/components/CategoryCard";
+import { TrackItem } from "@/components/Track";
+import { DeezerColors, musicPlayerColor } from "@/constants/Colors";
 import {
   getChartTracks,
   getGenres,
@@ -6,16 +8,7 @@ import {
 } from "@/services/deezerApiService";
 import { Genre, Playlist, Track } from "@/types/deezer";
 import { LinearGradient } from "expo-linear-gradient";
-import {
-  Bell,
-  Heart,
-  Mic2,
-  MoreHorizontal,
-  Play,
-  Podcast,
-  Settings,
-  Target,
-} from "lucide-react-native";
+import { Bell, Play, Settings } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -34,12 +27,6 @@ const ExploreScreen = () => {
   const [genres, setGenres] = useState<Genre[]>([]);
   const [featuredPlaylists, setFeaturedPlaylists] = useState<Playlist[]>([]);
   const [loading, setLoading] = useState(true);
-
-  const staticCategories = [
-    { id: 1, title: "Concerts", icon: Mic2, color: "#8B5CF6" },
-    { id: 2, title: "Music quizzes", icon: Target, color: "#8B5CF6" },
-    { id: 3, title: "Podcasts", icon: Podcast, color: "#8B5CF6" },
-  ];
 
   useEffect(() => {
     loadData();
@@ -73,54 +60,6 @@ const ExploreScreen = () => {
     }
   };
 
-  const CategoryCard = ({ item }: { item: any; isGenre?: boolean }) => (
-    <TouchableOpacity style={styles.categoryCard}>
-      <View style={styles.categoryContent}>
-        <Text style={styles.categoryTitle}>{item.title || item.name}</Text>
-        <View
-          style={[styles.categoryIcon, { backgroundColor: item.color + "30" }]}
-        >
-          {item.icon ? (
-            <item.icon size={16} color={item.color} />
-          ) : (
-            <Text style={{ color: item.color || "#8B5CF6", fontSize: 12 }}>
-              {(item.name || item.title)?.charAt(0)}
-            </Text>
-          )}
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
-
-  const TrackItem = ({ item }: { item: Track }) => (
-    <TouchableOpacity style={styles.trackItem}>
-      <View style={styles.trackContent}>
-        <View style={styles.albumArt}>
-          <Image
-            source={{ uri: item.album.cover_medium }}
-            style={styles.albumImage}
-          />
-        </View>
-        <View style={styles.trackInfo}>
-          <Text style={styles.trackTitle} numberOfLines={1}>
-            {item.title}
-          </Text>
-          <Text style={styles.trackArtist} numberOfLines={1}>
-            {item.artist.name}
-          </Text>
-        </View>
-        <View style={styles.trackActions}>
-          <TouchableOpacity style={styles.heartButton}>
-            <Heart size={24} color={DeezerColors.textSecondary} />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.moreButton}>
-            <MoreHorizontal size={24} color={DeezerColors.textSecondary} />
-          </TouchableOpacity>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
-
   if (loading) {
     return (
       <SafeAreaView
@@ -129,7 +68,7 @@ const ExploreScreen = () => {
           { justifyContent: "center", alignItems: "center" },
         ]}
       >
-        <ActivityIndicator size="large" color={DeezerColors.primary} />
+        <ActivityIndicator size="large" color={musicPlayerColor} />
       </SafeAreaView>
     );
   }
@@ -171,13 +110,10 @@ const ExploreScreen = () => {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.categoriesScroll}
           >
-            {staticCategories.map((item) => (
-              <CategoryCard key={`static-${item.id}`} item={item} />
-            ))}
             {genres.map((genre) => (
               <CategoryCard
                 key={`genre-${genre.id}`}
-                item={{ ...genre, color: "#8B5CF6" }}
+                item={{ ...genre, color: musicPlayerColor }}
                 isGenre={true}
               />
             ))}
@@ -294,33 +230,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     gap: 15,
   },
-  categoryCard: {
-    width: 160,
-    height: 100,
-    borderRadius: 16,
-    backgroundColor: DeezerColors.surface,
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: DeezerColors.divider,
-  },
-  categoryContent: {
-    flex: 1,
-    padding: 20,
-    justifyContent: "space-between",
-  },
-  categoryTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: DeezerColors.text,
-  },
-  categoryIcon: {
-    alignSelf: "flex-end",
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    justifyContent: "center",
-    alignItems: "center",
-  },
+
   section: {
     paddingHorizontal: 20,
     marginBottom: 30,
@@ -399,58 +309,6 @@ const styles = StyleSheet.create({
   },
   tracksContainer: {
     gap: 12,
-  },
-  trackItem: {
-    backgroundColor: DeezerColors.surface,
-    borderRadius: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-    borderWidth: 1,
-    borderColor: DeezerColors.divider,
-  },
-  trackContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 12,
-  },
-  albumArt: {
-    width: 60,
-    height: 60,
-    borderRadius: 8,
-    marginRight: 15,
-    overflow: "hidden",
-    backgroundColor: "#f0f0f0",
-  },
-  albumImage: {
-    width: "100%",
-    height: "100%",
-    resizeMode: "cover",
-  },
-  trackInfo: {
-    flex: 1,
-  },
-  trackTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: DeezerColors.text,
-    marginBottom: 2,
-  },
-  trackArtist: {
-    fontSize: 14,
-    color: DeezerColors.textSecondary,
-  },
-  trackActions: {
-    flexDirection: "row",
-    gap: 15,
-  },
-  heartButton: {
-    padding: 5,
-  },
-  moreButton: {
-    padding: 5,
   },
 });
 

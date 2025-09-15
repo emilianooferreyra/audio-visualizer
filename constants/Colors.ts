@@ -1,6 +1,8 @@
 const tintColorLight = "#0a7ea4";
 const tintColorDark = "#fff";
 
+export const musicPlayerColor = "#9ec0c1";
+
 // Deezer-inspired colors
 export const DeezerColors = {
   primary: "#a238ff", // Purple accent

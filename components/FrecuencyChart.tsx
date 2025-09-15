@@ -42,7 +42,7 @@ export const FrequencyChart = (props: ChartProps) => {
       const x = barIndex * (barWidth + 5);
       const y1 = height;
       const y2 = isPlaying ? height - height * (average / 255) : height - 2;
-      const color = "#a238ff";
+      const color = "#9ec0c1";
 
       p.push({ x1: x, x2: x, y1, y2, color });
       barIndex++;

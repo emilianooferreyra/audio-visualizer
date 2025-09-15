@@ -1,4 +1,4 @@
-import { DeezerColors } from "@/constants/Colors";
+import { DeezerColors, musicPlayerColor } from "@/constants/Colors";
 import { Track } from "@/types/deezer";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -96,7 +96,7 @@ const Info = ({
               { opacity: canGoPrevious ? 1 : 0.5 },
             ]}
           >
-            <SkipBack size={30} color="white" />
+            <SkipBack size={30} color="black" />
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -105,11 +105,11 @@ const Info = ({
             style={[styles.playPauseButton, { opacity: isLoading ? 0.5 : 1 }]}
           >
             {isLoading ? (
-              <Loader2 size={30} color="white" />
+              <Loader2 size={30} color="black" />
             ) : isPlaying ? (
-              <Pause size={30} color="white" />
+              <Pause size={30} color="black" />
             ) : (
-              <Play size={30} color="white" />
+              <Play size={30} color="black" />
             )}
           </TouchableOpacity>
 
@@ -118,7 +118,7 @@ const Info = ({
             disabled={!canGoNext}
             style={[styles.playPauseButton, { opacity: canGoNext ? 1 : 0.5 }]}
           >
-            <SkipForward size={30} color="white" />
+            <SkipForward size={30} color="black" />
           </TouchableOpacity>
         </View>
       </View>
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   playPauseButton: {
-    backgroundColor: DeezerColors.primary,
+    backgroundColor: musicPlayerColor,
     width: 60,
     height: 60,
     borderRadius: 30,
